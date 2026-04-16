@@ -96,8 +96,8 @@ link-crds:
 		echo "Linked $$crd → crds/"; \
 	done
 
-EVEREST_OPERATOR_REPO_URL ?= https://github.com/openeverest/openeverest-operator
-OPENEVEREST_REPO_URL ?= https://github.com/openeverest/openeverest
+EVEREST_OPERATOR_REPO_URL ?= /home/drecharte/dev/openeverest/openeverest
+OPENEVEREST_REPO_URL ?= /home/drecharte/dev/openeverest/openeverest
 CRD_DIR ?= config/crd
 CRD_VERSION ?= main
 # FIXME: this is temporary until we have a split between v1 and v2

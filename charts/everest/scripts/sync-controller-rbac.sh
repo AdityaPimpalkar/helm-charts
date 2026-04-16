@@ -25,13 +25,26 @@ trap 'rm -rf "$TMPDIR"' EXIT
 
 echo "Fetching controller RBAC from ${OPENEVEREST_REPO_URL}/config/rbac?ref=${OPENEVEREST_VERSION}..."
 
-# Fetch the raw RBAC manifests via kustomize (same Docker pattern as crds-gen).
-docker run --rm \
-  -v "${TMPDIR}":/workspace \
-  -w /workspace \
-  "${KUSTOMIZE_IMAGE}" \
-  build "${OPENEVEREST_REPO_URL}/config/rbac?ref=${OPENEVEREST_VERSION}" \
-  --output /workspace/
+# Determine if OPENEVEREST_REPO_URL is a local path or a remote URL
+if [[ "${OPENEVEREST_REPO_URL}" == http* ]]; then
+  # Remote URL - use git ref syntax
+  KUSTOMIZE_PATH="${OPENEVEREST_REPO_URL}/config/rbac?ref=${OPENEVEREST_VERSION}"
+  docker run --rm \
+    -v "${TMPDIR}":/workspace \
+    -w /workspace \
+    "${KUSTOMIZE_IMAGE}" \
+    build "${KUSTOMIZE_PATH}" \
+    --output /workspace/
+else
+  # Local path - mount the directory
+  docker run --rm \
+    -v "${OPENEVEREST_REPO_URL}":/source \
+    -v "${TMPDIR}":/workspace \
+    -w /workspace \
+    "${KUSTOMIZE_IMAGE}" \
+    build /source/config/rbac \
+    --output /workspace/
+fi
 
 echo "Fetched manifests to temp dir:"
 ls -la "${TMPDIR}"
